@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState , useRef} from "react";
 
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
 import Button from "../UI/Button/Button";
 import Input from "../UI/Input/Input";
 import AuthContext from "../../store/auth-context";
-
 
 const emailReducer = (prevState, action) => {
   if (action.type === "INPUT_SET") {
@@ -85,33 +84,48 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    ctx.onLogin(emailState.value, passwordState.value);
+    if (formIsValid) {
+      ctx.onLogin(emailState.value, passwordState.value);
+    } else if (!isEmailValid) {
+      //
+      emailInputRef.current.myFocus();
+
+    } else {
+
+      passwordInputRef.current.myFocus();
+
+    }
   };
+
+
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
-
         <Input
           id="email"
           type="email"
+          ref = {emailInputRef}
           label="E-Mail"
-          State = {emailState}
-          changeHandler = {emailChangeHandler}
-          validateHandler = {validateEmailHandler}
+          State={emailState}
+          changeHandler={emailChangeHandler}
+          validateHandler={validateEmailHandler}
         />
 
         <Input
           id="password"
           type="password"
           label="Password"
-          State = {passwordState}
-          changeHandler = {passwordChangeHandler}
-          validateHandler = {validatePasswordHandler}
+          ref={passwordInputRef}
+          State={passwordState}
+          changeHandler={passwordChangeHandler}
+          validateHandler={validatePasswordHandler}
         />
 
         <div className={classes.actions}>
-          <Button type="submit" className={classes.btn} disabled={!formIsValid}>
+          <Button type="submit" className={classes.btn}>
             Login
           </Button>
         </div>
