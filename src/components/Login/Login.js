@@ -18,21 +18,35 @@ const emailReducer = (prevState, action) =>{
   return {value:'', isValid:false}
 }
 
+const passwordReducer = (prevState, action) =>{
+
+  if(action.type === "INPUT_SET"){
+    return {value:action.val, isValid:action.val.trim().length > 6}
+  }
+
+  if(action.type === "INPUT_CHECK"){
+    return {value:prevState.value, isValid:prevState.value.trim().length > 6}
+  }
+
+  return {value:'', isValid:false}
+}
+
 const Login = (props) => {
   // const [enteredEmail, setEnteredEmail] = useState('');
   // const [emailIsValid, setEmailIsValid] = useState();
-  const [enteredPassword, setEnteredPassword] = useState('');
-  const [passwordIsValid, setPasswordIsValid] = useState();
+  // const [enteredPassword, setEnteredPassword] = useState('');
+  // const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
   const [emailState, dispatchEmail]=useReducer(emailReducer, {value:'', isValid:false});
+  const [passwordState, dispatchPassword]=useReducer(passwordReducer, {value:'', isValid:false});
 
   useEffect(()=>{
 
     const identifier = setTimeout(()=>{
       console.log('form validity run')
       setFormIsValid(
-        emailState.isValid && enteredPassword.trim().length > 6
+        emailState.isValid && passwordState.isValid
       );
     }, 700)
 
@@ -41,34 +55,28 @@ const Login = (props) => {
       clearTimeout(identifier)
     }
     
-  },[emailState.value, enteredPassword])
+  },[emailState.value, passwordState.value])
 
   const emailChangeHandler = (event) => {
     dispatchEmail({type:"INPUT_SET", val: event.target.value}) 
   };
 
   const passwordChangeHandler = (event) => {
-    setEnteredPassword(event.target.value);
+    dispatchPassword({type:"INPUT_SET", val: event.target.value}) 
   };
 
   const validateEmailHandler = () => {
     dispatchEmail({type:"INPUT_CHECK"}) 
   };
 
-
-  //We update a state base on another state
-  //it's ok but sometime it could make an issue
-  //we could merge this states
-  //we could do this by define an object in useState
-  //but when States are bigger it's totally worth to
-  //look at useReducer
+  
   const validatePasswordHandler = () => {
-    setPasswordIsValid(enteredPassword.trim().length > 6);
+    dispatchPassword({type:"INPUT_CHECK"}) 
   };
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailState.value, enteredPassword);
+    props.onLogin(emailState.value, passwordState.value);
   };
 
   return (
@@ -90,14 +98,14 @@ const Login = (props) => {
         </div>
         <div
           className={`${classes.control} ${
-            passwordIsValid === false ? classes.invalid : ''
+            passwordState.isValid === false ? classes.invalid : ''
           }`}
         >
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
-            value={enteredPassword}
+            value={passwordState.value}
             onChange={passwordChangeHandler}
             onBlur={validatePasswordHandler}
           />
