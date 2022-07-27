@@ -40,6 +40,13 @@ const Login = (props) => {
     setEmailIsValid(enteredEmail.includes('@'));
   };
 
+
+  //We update a state base on another state
+  //it's ok but sometime it could make an issue
+  //we could merge this states
+  //we could do this by define an object in useState
+  //but when States are bigger it's totally worth to
+  //look at useReducer
   const validatePasswordHandler = () => {
     setPasswordIsValid(enteredPassword.trim().length > 6);
   };
